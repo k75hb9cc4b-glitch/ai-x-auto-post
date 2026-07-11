@@ -14,6 +14,7 @@ creds = Credentials.from_service_account_file(
 
 gc = gspread.authorize(creds)
 
+
 def get_random_product():
     sheet = gc.open(SHEET_NAME).sheet1
     values = sheet.get_all_records()
@@ -21,13 +22,15 @@ def get_random_product():
     if not values:
         return None
 
-   for i, row in enumerate(values, start=2):
-    if not row["投稿済み"]:
-        row["_row"] = i
-        return row
+    for i, row in enumerate(values, start=2):
+        if not row["投稿済み"]:
+            row["_row"] = i
+            return row
 
-return None
-    def mark_posted(row):
+    return None
+
+
+def mark_posted(row):
     sheet = gc.open(SHEET_NAME).sheet1
     sheet.update_cell(row, 5, "TRUE")   # 投稿済み
     sheet.update_cell(row, 6, str(__import__("datetime").datetime.now()))
