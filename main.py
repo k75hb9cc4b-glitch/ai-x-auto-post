@@ -27,15 +27,16 @@ def main():
 {url}
 """
 
-   post = generate_post(prompt)
+    post = generate_post(prompt)
 
-print(post)
+    print(post)
 
-post_to_x(post)
+    post_to_x(post)
 
-mark_posted(product["_row"])
+    mark_posted(product["_row"])
 
-print("投稿成功")
+    print("投稿成功")
+
 
 if __name__ == "__main__":
     main()
