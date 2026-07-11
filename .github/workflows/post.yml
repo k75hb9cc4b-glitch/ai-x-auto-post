@@ -3,9 +3,6 @@ name: AI X Auto Poster
 on:
   workflow_dispatch:
 
-  schedule:
-    - cron: "0 */4 * * *"
-
 jobs:
   post:
     runs-on: ubuntu-latest
