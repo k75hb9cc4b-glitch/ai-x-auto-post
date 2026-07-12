@@ -27,20 +27,13 @@ def main():
 {url}
 """
 
+    # OpenAIには送る（動作確認のため）
     post = generate_post(prompt)
-
-    post = f"""{post}
-
-👇作品はこちら
-{url}
-
-🔞18歳未満閲覧禁止
-#PR
-"""
 
     print(post)
 
-    post_to_x(post)
+    # ★ここをURLだけ投稿するように変更
+    post_to_x(url)
 
     mark_posted(product["_row"])
 
