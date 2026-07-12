@@ -27,13 +27,22 @@ def main():
 {url}
 """
 
-    post = generate_post(prompt)
+post = generate_post(prompt)
 
-    print(post)
+post = f"""{post}
 
-    post_to_x(post)
+👇作品はこちら
+{url}
 
-    mark_posted(product["_row"])
+🔞18歳未満閲覧禁止
+#PR
+"""
+
+print(post)
+
+post_to_x(post)
+
+mark_posted(product["_row"])
 
     print("投稿成功")
 
