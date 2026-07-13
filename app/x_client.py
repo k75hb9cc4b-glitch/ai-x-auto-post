@@ -10,6 +10,7 @@ from app.config import (
     X_ACCESS_TOKEN_SECRET,
 )
 
+# X API v2（ツイート投稿）
 client = tweepy.Client(
     consumer_key=X_API_KEY,
     consumer_secret=X_API_SECRET,
@@ -17,6 +18,7 @@ client = tweepy.Client(
     access_token_secret=X_ACCESS_TOKEN_SECRET,
 )
 
+# X API v1.1（画像アップロード）
 auth = tweepy.OAuth1UserHandler(
     X_API_KEY,
     X_API_SECRET,
@@ -32,17 +34,31 @@ def download_image(url):
     if not url:
         return None
 
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/138.0 Safari/537.36"
+        ),
+        "Referer": "https://www.dmm.co.jp/",
+    }
+
     try:
 
-        r = requests.get(url, timeout=20)
+        print(f"画像取得: {url}")
 
-        if r.status_code != 200:
-            return None
+        response = requests.get(
+            url,
+            headers=headers,
+            timeout=30,
+        )
+
+        response.raise_for_status()
 
         fd, path = tempfile.mkstemp(suffix=".jpg")
 
         with os.fdopen(fd, "wb") as f:
-            f.write(r.content)
+            f.write(response.content)
 
         return path
 
@@ -61,9 +77,6 @@ def post_to_x(text, image_urls=None):
 
         for url in image_urls:
 
-            if not url:
-                continue
-
             path = download_image(url)
 
             if not path:
@@ -71,18 +84,40 @@ def post_to_x(text, image_urls=None):
 
             try:
 
-                media = api.media_upload(path)
+                media = api.media_upload(filename=path)
 
                 media_ids.append(media.media_id)
+
+                print("画像アップロード成功")
+
+            except Exception as e:
+
+                print("画像アップロード失敗:", e)
 
             finally:
 
                 if os.path.exists(path):
                     os.remove(path)
 
-    client.create_tweet(
-        text=text,
-        media_ids=media_ids if media_ids else None,
-    )
+    try:
 
-    print("投稿成功")
+        if media_ids:
+
+            client.create_tweet(
+                text=text,
+                media_ids=media_ids,
+            )
+
+        else:
+
+            client.create_tweet(
+                text=text,
+            )
+
+        print("投稿成功")
+
+    except Exception as e:
+
+        print("投稿失敗:", e)
+
+        raise
