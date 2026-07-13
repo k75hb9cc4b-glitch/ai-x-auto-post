@@ -1,5 +1,7 @@
 import gspread
 from google.oauth2.service_account import Credentials
+from datetime import datetime
+
 from app.config import GOOGLE_CREDENTIALS, SHEET_NAME
 
 SCOPES = [
@@ -15,22 +17,39 @@ creds = Credentials.from_service_account_file(
 gc = gspread.authorize(creds)
 
 
+def get_sheet():
+    return gc.open(SHEET_NAME).sheet1
+
+
 def get_random_product():
-    sheet = gc.open(SHEET_NAME).sheet1
+    sheet = get_sheet()
     values = sheet.get_all_records()
 
-    if not values:
-        return None
-
     for i, row in enumerate(values, start=2):
-        if not row["投稿済み"]:
-            row["_row"] = i
-            return row
+
+        if str(row.get("投稿済み", "")).strip():
+            continue
+
+        return {
+            "row": i,
+            "title": row.get("作品名", ""),
+            "affiliate_url": row.get("アフィリエイトURL", ""),
+            "genre": row.get("ジャンル", ""),
+            "images": [
+                row.get("画像URL1", ""),
+                row.get("画像URL2", ""),
+                row.get("画像URL3", ""),
+                row.get("画像URL4", ""),
+            ],
+        }
 
     return None
 
 
 def mark_posted(row):
-    sheet = gc.open(SHEET_NAME).sheet1
-    sheet.update_cell(row, 5, "TRUE")   # 投稿済み
-    sheet.update_cell(row, 6, str(__import__("datetime").datetime.now()))
+
+    sheet = get_sheet()
+
+    sheet.update(f"I{row}", "TRUE")
+
+    sheet.update(f"J{row}", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
