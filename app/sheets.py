@@ -39,13 +39,18 @@ def get_random_product():
     return None
 
 
-def mark_posted(row):
+def mark_posted(row, tweet_id):
 
     sheet = get_sheet()
 
-    sheet.update(f"I{row}", [["TRUE"]])
+    # L列 TweetID
+    sheet.update(f"L{row}", [[str(tweet_id)]])
 
+    # M列 投稿済み
+    sheet.update(f"M{row}", [["TRUE"]])
+
+    # N列 投稿日時
     sheet.update(
-        f"J{row}",
+        f"N{row}",
         [[datetime.now().strftime("%Y-%m-%d %H:%M:%S")]],
     )
