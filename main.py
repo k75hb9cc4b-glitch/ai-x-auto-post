@@ -8,11 +8,18 @@ from app.x_client import post_to_x
 
 def main():
 
+    print("=" * 40)
+    print("AI X Auto Poster")
+    print("=" * 40)
+
     product = get_random_product()
 
     if not product:
         print("投稿する作品がありません")
         return
+
+    print(f"作品名 : {product.get('作品名')}")
+    print(f"ジャンル : {product.get('ジャンル')}")
 
     url = (
         product.get("アフィリエイトURL")
@@ -44,12 +51,10 @@ def main():
         "👇チェックしてみて",
     ])
 
-    hashtags = random.choice([
-        "#PR",
-        "#AI同人 #PR",
-        "#同人AI #PR",
-        "#AIイラスト #PR",
-        "#ギャル #PR",
+    warning = random.choice([
+        "🔞18歳未満閲覧禁止",
+        "※18歳未満閲覧禁止",
+        "18歳未満は閲覧できません",
     ])
 
     post = f"""{post}
@@ -57,8 +62,8 @@ def main():
 {call_to_action}
 {url}
 
-🔞18歳未満閲覧禁止
-{hashtags}
+{warning}
+#PR
 """
 
     image_urls = [
@@ -68,13 +73,19 @@ def main():
         product.get("画像URL4"),
     ]
 
+    print("画像枚数 :", len([x for x in image_urls if x]))
+
     print("Xへ投稿中...")
 
     post_to_x(post, image_urls)
 
+    print("投稿済みに更新")
+
     mark_posted(product["_row"])
 
-    print("投稿成功！")
+    print("=" * 40)
+    print("投稿完了")
+    print("=" * 40)
 
 
 if __name__ == "__main__":
