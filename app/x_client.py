@@ -10,7 +10,6 @@ from app.config import (
     X_ACCESS_TOKEN_SECRET,
 )
 
-# API v2
 client = tweepy.Client(
     consumer_key=X_API_KEY,
     consumer_secret=X_API_SECRET,
@@ -18,7 +17,6 @@ client = tweepy.Client(
     access_token_secret=X_ACCESS_TOKEN_SECRET,
 )
 
-# API v1.1（画像アップロード）
 auth = tweepy.OAuth1UserHandler(
     X_API_KEY,
     X_API_SECRET,
@@ -35,9 +33,7 @@ def download_image(url):
         return None
 
     headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-        ),
+        "User-Agent": "Mozilla/5.0",
         "Referer": "https://www.dmm.co.jp/",
     }
 
@@ -106,15 +102,23 @@ def post_to_x(text, image_urls=None):
 
     if media_ids:
 
-        client.create_tweet(
+        response = client.create_tweet(
             text=text,
             media_ids=media_ids,
         )
 
     else:
 
-        client.create_tweet(
+        response = client.create_tweet(
             text=text,
         )
 
+    tweet_id = response.data["id"]
+
+    print("=" * 40)
     print("投稿成功")
+    print(f"Tweet ID : {tweet_id}")
+    print(f"https://x.com/i/web/status/{tweet_id}")
+    print("=" * 40)
+
+    return tweet_id
