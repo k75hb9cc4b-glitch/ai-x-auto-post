@@ -1,3 +1,5 @@
+import random
+
 from app.sheets import get_random_product, mark_posted
 from app.prompts import SYSTEM_PROMPT
 from app.openai_client import generate_post
@@ -9,13 +11,12 @@ def main():
     product = get_random_product()
 
     if not product:
-        print("商品がありません")
+        print("投稿する作品がありません")
         return
 
     url = (
         product.get("アフィリエイトURL")
-        if product.get("アフィリエイトURL")
-        else product.get("作品URL")
+        or product.get("作品URL")
     )
 
     prompt = f"""
@@ -35,13 +36,29 @@ def main():
 
     post = generate_post(prompt)
 
+    call_to_action = random.choice([
+        "👇作品はこちら",
+        "👇サンプルはこちら",
+        "👇気になる人はこちら",
+        "👇詳細はこちら",
+        "👇チェックしてみて",
+    ])
+
+    hashtags = random.choice([
+        "#PR",
+        "#AI同人 #PR",
+        "#同人AI #PR",
+        "#AIイラスト #PR",
+        "#ギャル #PR",
+    ])
+
     post = f"""{post}
 
-👇作品はこちら
+{call_to_action}
 {url}
 
 🔞18歳未満閲覧禁止
-#PR
+{hashtags}
 """
 
     image_urls = [
