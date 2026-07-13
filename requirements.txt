@@ -1,6 +1,6 @@
-openai>=1.40.0
+tweepy
+requests
 gspread
 google-auth
-requests
 python-dotenv
-tweepy
+openai
