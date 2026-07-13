@@ -7,51 +7,56 @@ from app.config import (
     X_API_KEY,
     X_API_SECRET,
     X_ACCESS_TOKEN,
-    X_ACCESS_TOKEN_SECRET,
+    X_ACCESS_SECRET,
 )
 
-# v2（ツイート投稿）
+
+# API v2
 client = tweepy.Client(
     consumer_key=X_API_KEY,
     consumer_secret=X_API_SECRET,
     access_token=X_ACCESS_TOKEN,
-    access_token_secret=X_ACCESS_TOKEN_SECRET,
+    access_token_secret=X_ACCESS_SECRET,
 )
 
-# v1.1（画像アップロード）
+# API v1.1（画像アップロード用）
 auth = tweepy.OAuth1UserHandler(
     X_API_KEY,
     X_API_SECRET,
     X_ACCESS_TOKEN,
-    X_ACCESS_TOKEN_SECRET,
+    X_ACCESS_SECRET,
 )
 
 api = tweepy.API(auth)
 
 
 def download_image(url):
+
+    if not url:
+        return None
+
     try:
+
         r = requests.get(url, timeout=20)
 
         if r.status_code != 200:
             return None
 
-        tmp = tempfile.NamedTemporaryFile(
-            delete=False,
-            suffix=".jpg"
-        )
+        fd, path = tempfile.mkstemp(suffix=".jpg")
 
-        tmp.write(r.content)
-        tmp.close()
+        with os.fdopen(fd, "wb") as f:
+            f.write(r.content)
 
-        return tmp.name
+        return path
 
     except Exception as e:
-        print("画像取得失敗:", e)
+
+        print(e)
+
         return None
 
 
-def post_to_x(text, image_urls=None):
+def post_tweet(text, image_urls=None):
 
     media_ids = []
 
@@ -75,18 +80,11 @@ def post_to_x(text, image_urls=None):
 
             finally:
 
-                if os.path.exists(path):
-                    os.remove(path)
+                os.remove(path)
 
-    if media_ids:
+    client.create_tweet(
+        text=text,
+        media_ids=media_ids if media_ids else None,
+    )
 
-        client.create_tweet(
-            text=text,
-            media_ids=media_ids
-        )
-
-    else:
-
-        client.create_tweet(
-            text=text
-        )
+    print("投稿成功")
