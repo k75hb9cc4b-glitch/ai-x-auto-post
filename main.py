@@ -8,9 +8,9 @@ from app.x_client import post_to_x
 
 def main():
 
-    print("=" * 40)
-    print("AI X Auto Poster")
-    print("=" * 40)
+    print("=" * 50)
+    print("🤖 AI X Auto Poster")
+    print("=" * 50)
 
     product = get_random_product()
 
@@ -20,6 +20,7 @@ def main():
 
     print(f"作品名 : {product.get('作品名')}")
     print(f"ジャンル : {product.get('ジャンル')}")
+    print(f"サークル : {product.get('サークル')}")
 
     url = (
         product.get("アフィリエイトURL")
@@ -35,11 +36,20 @@ def main():
 ジャンル:
 {product.get("ジャンル")}
 
+サークル:
+{product.get("サークル")}
+
+タグ:
+{product.get("タグ")}
+
+あらすじ:
+{product.get("あらすじ")}
+
 作品URL:
 {url}
 """
 
-    print("AI文章生成中...")
+    print("🧠 AI文章生成中...")
 
     post = generate_post(prompt)
 
@@ -73,19 +83,26 @@ def main():
         product.get("画像URL4"),
     ]
 
-    print("画像枚数 :", len([x for x in image_urls if x]))
+    print(f"📷 画像枚数 : {len([x for x in image_urls if x])}")
 
-    print("Xへ投稿中...")
+    print("🚀 Xへ投稿中...")
 
-    post_to_x(post, image_urls)
+    tweet_id = post_to_x(
+        post,
+        image_urls,
+    )
 
-    print("投稿済みに更新")
+    print("📝 スプレッドシート更新中...")
 
-    mark_posted(product["_row"])
+    mark_posted(
+        product["_row"],
+        tweet_id,
+    )
 
-    print("=" * 40)
-    print("投稿完了")
-    print("=" * 40)
+    print("=" * 50)
+    print("✅ 投稿完了")
+    print(f"TweetID : {tweet_id}")
+    print("=" * 50)
 
 
 if __name__ == "__main__":
