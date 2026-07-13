@@ -7,24 +7,21 @@ from app.config import (
     X_API_KEY,
     X_API_SECRET,
     X_ACCESS_TOKEN,
-    X_ACCESS_SECRET,
+    X_ACCESS_TOKEN_SECRET,
 )
 
-
-# API v2
 client = tweepy.Client(
     consumer_key=X_API_KEY,
     consumer_secret=X_API_SECRET,
     access_token=X_ACCESS_TOKEN,
-    access_token_secret=X_ACCESS_SECRET,
+    access_token_secret=X_ACCESS_TOKEN_SECRET,
 )
 
-# API v1.1（画像アップロード用）
 auth = tweepy.OAuth1UserHandler(
     X_API_KEY,
     X_API_SECRET,
     X_ACCESS_TOKEN,
-    X_ACCESS_SECRET,
+    X_ACCESS_TOKEN_SECRET,
 )
 
 api = tweepy.API(auth)
@@ -51,12 +48,12 @@ def download_image(url):
 
     except Exception as e:
 
-        print(e)
+        print("画像取得失敗:", e)
 
         return None
 
 
-def post_tweet(text, image_urls=None):
+def post_to_x(text, image_urls=None):
 
     media_ids = []
 
@@ -80,7 +77,8 @@ def post_tweet(text, image_urls=None):
 
             finally:
 
-                os.remove(path)
+                if os.path.exists(path):
+                    os.remove(path)
 
     client.create_tweet(
         text=text,
