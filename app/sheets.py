@@ -22,7 +22,9 @@ def get_sheet():
 
 
 def get_random_product():
+
     sheet = get_sheet()
+
     values = sheet.get_all_records()
 
     for i, row in enumerate(values, start=2):
@@ -30,18 +32,9 @@ def get_random_product():
         if str(row.get("投稿済み", "")).strip():
             continue
 
-        return {
-            "row": i,
-            "title": row.get("作品名", ""),
-            "affiliate_url": row.get("アフィリエイトURL", ""),
-            "genre": row.get("ジャンル", ""),
-            "images": [
-                row.get("画像URL1", ""),
-                row.get("画像URL2", ""),
-                row.get("画像URL3", ""),
-                row.get("画像URL4", ""),
-            ],
-        }
+        row["_row"] = i
+
+        return row
 
     return None
 
@@ -50,6 +43,9 @@ def mark_posted(row):
 
     sheet = get_sheet()
 
-    sheet.update(f"I{row}", "TRUE")
+    sheet.update(f"I{row}", [["TRUE"]])
 
-    sheet.update(f"J{row}", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    sheet.update(
+        f"J{row}",
+        [[datetime.now().strftime("%Y-%m-%d %H:%M:%S")]],
+    )
